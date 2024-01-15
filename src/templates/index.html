@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock title %}
+{% block content %}
+
+    <div class="col-sm-8">
+        <h4 class="d-inline-block">Collections</h4>
+        <form method="post" action="{% url 'fetch_data' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Fetch</button>
+        </form>
+        {#        <button id="fetch-btn" type="button" class="btn btn-success">Fetch</button>#}
+    </div>
+
+
+    <div class="col-sm-8 mt-3">
+        <h5>Available Collections:</h5>
+        {% if collections %}
+            <ul>
+                {% for collection in collections %}
+                    <li>
+                        <a href="{% url 'inspect' dataset_id=collection.id %}">
+
+                            <strong>{{ collection.filename }}</strong> -
+                            {{ collection.download_date|date:"F d, Y H:i:s" }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No collections available.</p>
+        {% endif %}
+    </div>
+
+{% endblock content %}
