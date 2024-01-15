@@ -1,0 +1,72 @@
+<!-- people.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}{{ dataset.name }}{% endblock title %}
+
+{% block content %}
+    <h1>{{ dataset.name }}</h1>
+
+    <p>
+        Filename: {{ csv_filename }}<br>
+        Download Date: {{ csv_download_date|date:"Y-m-d" }}
+    </p>
+
+    <form method="post" action="{% url 'inspect' dataset_id=dataset.id %}?page={{ page }}" id="load-more-form">
+
+        {% csrf_token %}
+        <table border="1">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Height</th>
+                <th>Mass</th>
+                <th>Hair Color</th>
+                <th>Skin Color</th>
+                <th>Eye Color</th>
+                <th>Birth Year</th>
+                <th>Gender</th>
+                <th>Homeworld</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+
+            <tbody id="people-table">
+            {% include 'load_more_row.html' %}
+            </tbody>
+        </table>
+
+        {% if has_next %}
+            <button type="button" id="load-more-button">Load more</button>
+        {% endif %}
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var page = {{ page }};
+            var loadMoreButton = document.getElementById('load-more-button');
+
+            loadMoreButton.addEventListener('click', function () {
+                page += 1;
+                var form = document.getElementById('load-more-form');
+                var url = form.action + '&page=' + page;
+
+                // AJAX request to fetch more data
+                fetch(url, {method: 'GET', headers: {'X-Requested-With': 'XMLHttpRequest'}})
+                    .then(response => response.json())
+                    .then(data => {
+                        // Append new rows to the table
+                        var tableBody = document.getElementById('people-table');
+                        tableBody.innerHTML += data.html;
+
+                        // Update the form action URL for the next request
+                        form.action = url;
+
+                        // Disable the "Load more" button if don't have more data
+                        loadMoreButton.disabled = !data.has_next;
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+{% endblock content %}

@@ -1,0 +1,6 @@
+Django==4.2
+psycopg2-binary==2.9.6
+django-environ==0.10.0
+petl==1.7.12
+requests==2.31.0
+coverage==7.3.2
